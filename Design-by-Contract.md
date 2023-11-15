@@ -35,7 +35,7 @@ When we are confident that the program is correct, we may compile
 a final version with disabled assertions, for improved efficiency.
 This is accomplished by defining the macro symbol NDEBUG.
 See 'man assert' for more details.
- 
+
 You may search the web to learn more about design-by-contract.
 
 ## Dealing with external errors
