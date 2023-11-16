@@ -46,9 +46,9 @@ int main(int argc, char *argv[])
     error(2, errno, "Rotating img2: %s", ImageErrMsg());
   }
 
-  ImageNegative(img2);
+  // ImageNegative(img2);
   // ImageThreshold(img2, 100);
-  // ImageBrighten(img2, 1.3);
+  ImageBrighten(img2, 1.3);
 
   if (ImageSave(img2, argv[2]) == 0)
   {
