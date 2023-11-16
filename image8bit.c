@@ -542,6 +542,23 @@ Image ImageRotate(Image img)
 { ///
   assert(img != NULL);
   // Insert your code here!
+  // code:
+  // 1. create a new image
+  // 2. copy the pixels from the original image to the new image
+  // 3. return the new image
+
+  // 1. create a new image
+  Image img2 = ImageCreate(img->height, img->width, img->maxval);
+
+  // 2. copy the pixels from the original image to the new image
+  for (int i = 0; i < img->height; i++)
+  {
+    for (int j = 0; j < img->width; j++)
+      img2->pixel[j * img->height + (img->height - i - 1)] = img->pixel[i * img->width + j];
+  }
+
+  // 3. return the new image
+  return img2;
 }
 
 /// Mirror an image = flip left-right.
