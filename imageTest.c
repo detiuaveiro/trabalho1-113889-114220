@@ -48,7 +48,8 @@ int main(int argc, char *argv[])
 
   // ImageNegative(img2);
   // ImageThreshold(img2, 100);
-  ImageBrighten(img2, 1.3);
+  // ImageBrighten(img2, 1.3);
+  ImageRotate(img2);
 
   if (ImageSave(img2, argv[2]) == 0)
   {

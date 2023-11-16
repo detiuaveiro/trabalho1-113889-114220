@@ -149,11 +149,29 @@ void ImageInit(void)
   // Name other counters here...
   InstrName[1] = "negative";  // Name for negative transformation
   InstrName[2] = "threshold"; // Name for threshold transformation
+  InstrName[3] = "rotate";    // Name for rotate transformation
+  InstrName[4] = "mirror";    // Name for mirror transformation
+  InstrName[5] = "crop";      // Name for crop transformation
+  InstrName[6] = "paste";     // Name for paste operation
+  InstrName[7] = "blend";     // Name for blend operation
+  InstrName[8] = "matchsub";  // Name for match subimage operation
+  InstrName[9] = "locatesub"; // Name for locate subimage operation
+  InstrName[10] = "blur";     // Name for blur operation
 }
 
 // Macros to simplify accessing instrumentation counters:
 #define PIXMEM InstrCount[0]
-// Add more macros here...
+#define NEGATIVE InstrCount[1]
+#define THRESHOLD InstrCount[2]
+#define ROTATE InstrCount[3]
+#define MIRROR InstrCount[4]
+#define CROP InstrCount[5]
+#define PASTE InstrCount[6]
+#define BLEND InstrCount[7]
+#define MATCHSUB InstrCount[8]
+#define LOCATESUB InstrCount[9]
+#define BLUR InstrCount[10]
+// Add more macros here if needed...
 
 // TIP: Search for PIXMEM or InstrCount to see where it is incremented!
 
