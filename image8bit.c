@@ -26,52 +26,6 @@
 #include <stdlib.h>
 #include "instrumentation.h"
 
-// Variáveis de contagem
-#define MAX_INSTRUMENTS 10 // or any other value you need
-unsigned long InstrCount[MAX_INSTRUMENTS];
-char *InstrName[MAX_INSTRUMENTS];
-
-// Outras declarações e definições...
-
-void InstrReset()
-{
-  // Implementação para resetar as contagens
-  for (int i = 0; i < MAX_INSTRUMENTS; i++)
-  {
-    InstrCount[i] = 0;
-  }
-}
-
-void InstrPrint()
-{
-  // Implementação para imprimir as contagens
-  for (int i = 0; i < MAX_INSTRUMENTS; i++)
-  {
-    printf("%s: %lu\n", InstrName[i], InstrCount[i]);
-  }
-}
-
-void InstrCalibrate()
-{
-  // Implementação para calibrar as contagens
-  InstrName[0] = "pixmem";
-  InstrName[1] = "imgmem";
-  InstrName[2] = "imgload";
-  InstrName[3] = "imgsave";
-  InstrName[4] = "imgcreate";
-  InstrName[5] = "imgdestroy";
-  InstrName[6] = "imggetpixel";
-  InstrName[7] = "imgsetpixel";
-  InstrName[8] = "imgrotate";
-  InstrName[9] = "imgmirror";
-  InstrName[10] = "imgcrop";
-  InstrName[11] = "imgpaste";
-  InstrName[12] = "imgblend";
-  InstrName[13] = "imgmatchsubimage";
-  InstrName[14] = "imglocatesubimage";
-  InstrName[15] = "imgblur";
-}
-
 // The data structure
 //
 // An image is stored in a structure containing 3 fields:
@@ -392,6 +346,28 @@ void ImageStats(Image img, uint8 *min, uint8 *max)
 { ///
   assert(img != NULL);
   // Insert your code here!
+  // code:
+  // 1. initialize min and max
+  // 2. find min and max
+
+  // 1. initialize min and max
+  *min = PixMax;
+  *max = 0;
+
+  // 2. find min and max
+  for (int i = 0; i < img->width * img->height; i++)
+  {
+    if (img->pixel[i] < *min)
+    {
+      *min = img->pixel[i];
+    }
+    if (img->pixel[i] > *max)
+    {
+      *max = img->pixel[i];
+    }
+  }
+
+  assert(*min <= *max);
 }
 
 /// Check if pixel position (x,y) is inside img.
@@ -406,6 +382,15 @@ int ImageValidRect(Image img, int x, int y, int w, int h)
 { ///
   assert(img != NULL);
   // Insert your code here!
+  // code:
+  // 1. check if the rectangle is inside the image
+
+  // 1. check if the rectangle is inside the image
+  if (x < 0 || y < 0 || x + w > img->width || y + h > img->height)
+  {
+    return 0;
+  }
+  return 1;
 }
 
 /// Pixel get & set operations
@@ -422,6 +407,14 @@ static inline int G(Image img, int x, int y)
 {
   int index;
   // Insert your code here!
+  // code:
+  // 1. compute the index
+  // 2. return the index
+
+  // 1. compute the index
+  index = y * img->width + x;
+
+  // 2. return the index
   assert(0 <= index && index < img->width * img->height);
   return index;
 }
@@ -458,6 +451,16 @@ void ImageNegative(Image img)
 { ///
   assert(img != NULL);
   // Insert your code here!
+  // code:
+  // 1. transform each pixel
+
+  // 1. transform each pixel
+  for (int i = 0; i < img->width * img->height; i++)
+  {
+    img->pixel[i] = PixMax - img->pixel[i];
+  }
+
+  assert(ImageMaxval(img) == PixMax);
 }
 
 /// Apply threshold to image.
@@ -537,6 +540,27 @@ Image ImageCrop(Image img, int x, int y, int w, int h)
   assert(img != NULL);
   assert(ImageValidRect(img, x, y, w, h));
   // Insert your code here!
+  // code:
+  // 1. create a new image
+  // 2. copy the pixels from the original image to the new image
+  // 3. return the new image
+
+  // 1. create a new image
+  Image img2 = ImageCreate(w, h, img->maxval);
+  if (img2 == NULL)
+  {
+    return NULL;
+  }
+
+  // 2. copy the pixels from the original image to the new image
+  for (int i = 0; i < h; i++)
+  {
+    for (int j = 0; j < w; j++)
+      img2->pixel[i * w + j] = img->pixel[(y + i) * img->width + (x + j)];
+  }
+
+  // 3. return the new image
+  return img2;
 }
 
 /// Operations on two images
