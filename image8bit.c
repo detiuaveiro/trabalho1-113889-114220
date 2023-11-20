@@ -739,6 +739,36 @@ int ImageLocateSubImage(Image img1, int *px, int *py, Image img2)
 /// [x-dx, x+dx]x[y-dy, y+dy].
 /// The image is changed in-place.
 void ImageBlur(Image img, int dx, int dy)
-{ ///
-  // Insert your code here!
+{
+  assert(img != NULL);
+  assert(dx >= 0 && dy >= 0);
+
+  for (int y = 0; y < img->height; ++y)
+  {
+    for (int x = 0; x < img->width; ++x)
+    {
+      int sum = 0;
+      int count = 0;
+
+      for (int j = -dy; j <= dy; ++j)
+      {
+        for (int i = -dx; i <= dx; ++i)
+        {
+          int nx = x + i;
+          int ny = y + j;
+
+          // Verificar se as coordenadas estão dentro dos limites da imagem
+          if (ImageValidPos(img, nx, ny))
+          {
+            sum += ImageGetPixel(img, nx, ny);
+            count++;
+          }
+        }
+      }
+
+      // Calcular a média e atualizar a imagem original
+      int mean = sum / count;
+      ImageSetPixel(img, x, y, mean);
+    }
+  }
 }
