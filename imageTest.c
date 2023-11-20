@@ -40,16 +40,27 @@ int main(int argc, char *argv[])
   // the appropriate lines.
 
   // img2 = ImageCrop(img1, ImageWidth(img1)/4, ImageHeight(img1)/4, ImageWidth(img1)/2, ImageHeight(img1)/2);
-  Image img2 = ImageRotate(img1);
-  if (img2 == NULL)
-  {
-    error(2, errno, "Rotating img2: %s", ImageErrMsg());
-  }
+  Image img2 = ImageCrop(img1, 0, 0, ImageWidth(img1), ImageHeight(img1));
+  // if (img2 == NULL)
+  // {
+  //   error(2, errno, "Rotating img2: %s", ImageErrMsg());
+  // }
 
   // ImageNegative(img2);
   // ImageThreshold(img2, 100);
   // ImageBrighten(img2, 1.3);
-  ImageRotate(img2);
+  // img2 = ImageRotate(img2);
+  // img2 = ImageMirror(img2);
+  Image img3 = ImageCrop(img2, 0, 0, ImageWidth(img2) / 2, ImageHeight(img2) / 2);
+  ImageNegative(img3);
+  // test ImagePaste com img2 e img3:
+  ImagePaste(img2, 0, 0, img3);
+
+  // test ImageBlend(Image img1, int x, int y, Image img2, double alpha)
+  ImageBlend(img2, 100, 100, img3, 0.5);
+
+  // test ImageMatchSubImage(Image img1, int x, int y, Image img2)
+  ImageMatchSubImage(img2, 100, 100, img3);
 
   if (ImageSave(img2, argv[2]) == 0)
   {

@@ -591,6 +591,23 @@ Image ImageMirror(Image img)
 { ///
   assert(img != NULL);
   // Insert your code here!
+  // code:
+  // 1. create a new image
+  // 2. mirror the pixels from the original image to the new image, from right to left
+  // 3. return the new image
+
+  // 1. create a new image
+  Image img2 = ImageCreate(img->width, img->height, img->maxval);
+
+  // 2. mirror the pixels from the original image to the new image, from right to left
+  for (int i = 0; i < img->height; i++)
+  {
+    for (int j = 0; j < img->width; j++)
+      img2->pixel[i * img->width + (img->width - j - 1)] = img->pixel[i * img->width + j];
+  }
+
+  // 3. return the new image
+  return img2;
 }
 
 /// Crop a rectangular subimage from img.
@@ -617,16 +634,12 @@ Image ImageCrop(Image img, int x, int y, int w, int h)
 
   // 1. create a new image
   Image img2 = ImageCreate(w, h, img->maxval);
-  if (img2 == NULL)
-  {
-    return NULL;
-  }
 
   // 2. copy the pixels from the original image to the new image
   for (int i = 0; i < h; i++)
   {
     for (int j = 0; j < w; j++)
-      img2->pixel[i * w + j] = img->pixel[(y + i) * img->width + (x + j)];
+      img2->pixel[i * w + j] = img->pixel[(i + y) * img->width + (j + x)];
   }
 
   // 3. return the new image
@@ -645,6 +658,17 @@ void ImagePaste(Image img1, int x, int y, Image img2)
   assert(img2 != NULL);
   assert(ImageValidRect(img1, x, y, img2->width, img2->height));
   // Insert your code here!
+  // code:
+  // 1. copy the pixels from img2 to img1
+
+  // 1. copy the pixels from img2 to img1
+  for (int i = 0; i < img2->height; i++)
+  {
+    for (int j = 0; j < img2->width; j++)
+      img1->pixel[(i + y) * img1->width + (j + x)] = img2->pixel[i * img2->width + j];
+  }
+
+  assert(ImageMaxval(img1) == ImageMaxval(img2));
 }
 
 /// Blend an image into a larger image.
@@ -659,6 +683,17 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha)
   assert(img2 != NULL);
   assert(ImageValidRect(img1, x, y, img2->width, img2->height));
   // Insert your code here!
+  // code:
+  // 1. blend the pixels from img2 to img1
+
+  // 1. blend the pixels from img2 to img1
+  for (int i = 0; i < img2->height; i++)
+  {
+    for (int j = 0; j < img2->width; j++)
+      img1->pixel[(i + y) * img1->width + (j + x)] = img1->pixel[(i + y) * img1->width + (j + x)] * (1 - alpha) + img2->pixel[i * img2->width + j] * alpha;
+  }
+
+  assert(ImageMaxval(img1) == ImageMaxval(img2));
 }
 
 /// Compare an image to a subimage of a larger image.
@@ -670,6 +705,20 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2)
   assert(img2 != NULL);
   assert(ImageValidPos(img1, x, y));
   // Insert your code here!
+  // code:
+  // 1. compare the pixels from img2 to img1
+
+  // 1. compare the pixels from img2 to img1
+  for (int i = 0; i < img2->height; i++)
+  {
+    for (int j = 0; j < img2->width; j++)
+    {
+      if (img1->pixel[(i + y) * img1->width + (j + x)] != img2->pixel[i * img2->width + j])
+      {
+        return 0;
+      }
+    }
+  }
 }
 
 /// Locate a subimage inside another image.
