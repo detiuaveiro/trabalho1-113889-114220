@@ -743,10 +743,14 @@ void ImageBlur(Image img, int dx, int dy)
   assert(img != NULL);
   assert(dx >= 0 && dy >= 0);
 
+  // Create a temporary image to store the blurred result
+  Image blurredImg = ImageCreate(img->width, img->height, img->maxval);
+
   for (int y = 0; y < img->height; ++y)
   {
     for (int x = 0; x < img->width; ++x)
     {
+      // Calculate the mean of the surrounding pixels
       int sum = 0;
       int count = 0;
 
@@ -757,7 +761,7 @@ void ImageBlur(Image img, int dx, int dy)
           int nx = x + i;
           int ny = y + j;
 
-          // Verificar se as coordenadas estão dentro dos limites da imagem
+          // Check if the pixel is within the image boundaries
           if (ImageValidPos(img, nx, ny))
           {
             sum += ImageGetPixel(img, nx, ny);
@@ -766,9 +770,20 @@ void ImageBlur(Image img, int dx, int dy)
         }
       }
 
-      // Calcular a média e atualizar a imagem original
-      int mean = sum / count;
-      ImageSetPixel(img, x, y, mean);
+      // Calculate the mean and update the blurred image
+      ImageSetPixel(blurredImg, x, y, sum / count);
     }
   }
+
+  // Copy the blurred image back to the original image
+  for (int y = 0; y < img->height; ++y)
+  {
+    for (int x = 0; x < img->width; ++x)
+    {
+      ImageSetPixel(img, x, y, ImageGetPixel(blurredImg, x, y));
+    }
+  }
+
+  // Destroy the temporary image
+  ImageDestroy(&blurredImg);
 }
