@@ -147,7 +147,7 @@ void ImageInit(void)
 { ///
   InstrCalibrate();
   InstrName[0] = "pixmem"; // InstrCount[0] will count pixel array acesses
-  // Name other counters here...
+  // Name other counters here....
   InstrName[1] = "negative";  // Name for negative transformation
   InstrName[2] = "threshold"; // Name for threshold transformation
   InstrName[3] = "rotate";    // Name for rotate transformation
@@ -156,8 +156,8 @@ void ImageInit(void)
   InstrName[6] = "paste";     // Name for paste operation
   InstrName[7] = "blend";     // Name for blend operation
   InstrName[8] = "matchsub";  // Name for match subimage operation
-  InstrName[9] = "locatesub"; // Name for locate subimage operation
-  InstrName[10] = "blur";     // Name for blur operation
+  // InstrName[10] = "locatesub"; // Name for locate subimage operation
+  InstrName[9] = "blur"; // Name for blur operation
 }
 
 // Macros to simplify accessing instrumentation counters:
@@ -170,8 +170,8 @@ void ImageInit(void)
 #define PASTE InstrCount[6]
 #define BLEND InstrCount[7]
 #define MATCHSUB InstrCount[8]
-#define LOCATESUB InstrCount[9]
-#define BLUR InstrCount[10]
+// #define LOCATESUB InstrCount[10]
+#define BLUR InstrCount[9]
 // Add more macros here if needed...
 
 // TIP: Search for PIXMEM or InstrCount to see where it is incremented!
@@ -515,24 +515,18 @@ void ImageThreshold(Image img, uint8 thr)
 /// This will brighten the image if factor>1.0 and
 /// darken the image if factor<1.0.
 void ImageBrighten(Image img, double factor)
-{ ///
+{
   assert(img != NULL);
   assert(factor >= 0.0);
-  // Insert your code here!
-  // code:
-  // 1. transform each pixel
 
   // 1. transform each pixel
   for (int i = 0; i < img->width * img->height; i++)
   {
-    if (img->pixel[i] * factor > PixMax)
-    {
-      img->pixel[i] = PixMax;
-    }
-    else
-    {
-      img->pixel[i] = img->pixel[i] * factor;
-    }
+    // Use casting to ensure accurate calculations
+    int newPixelValue = (int)(img->pixel[i] * factor + 0.5);
+
+    // Saturate at PixMax
+    img->pixel[i] = (uint8_t)(newPixelValue > PixMax ? PixMax : newPixelValue);
   }
 }
 
@@ -561,23 +555,18 @@ Image ImageRotate(Image img)
 { ///
   assert(img != NULL);
   // Insert your code here!
-  // code:
-  // 1. create a new image
-  // 2. copy the pixels from the original image to the new image
-  // 3. return the new image
-
-  // 1. create a new image
-  Image img2 = ImageCreate(img->height, img->width, img->maxval);
-
-  // 2. copy the pixels from the original image to the new image
-  for (int i = 0; i < img->height; i++)
+  int imgInHEight = ImageHeight(img);
+  int imgInWidth = ImageWidth(img);
+  Image imgReturn = ImageCreate(imgInHEight, imgInWidth, ImageMaxval(img));
+  for (int y = 0; y < imgInHEight; y++)
   {
-    for (int j = 0; j < img->width; j++)
-      img2->pixel[j * img->height + (img->height - i - 1)] = img->pixel[i * img->width + j];
+    for (int x = 0; x < imgInWidth; x++)
+    {
+      ImageSetPixel(imgReturn, y, imgInWidth - x - 1, ImageGetPixel(img, x, y));
+    }
   }
 
-  // 3. return the new image
-  return img2;
+  return imgReturn;
 }
 
 /// Mirror an image = flip left-right.
@@ -683,17 +672,16 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha)
   assert(img2 != NULL);
   assert(ImageValidRect(img1, x, y, img2->width, img2->height));
   // Insert your code here!
-  // code:
-  // 1. blend the pixels from img2 to img1
-
-  // 1. blend the pixels from img2 to img1
-  for (int i = 0; i < img2->height; i++)
+  uint8 level = 0;
+  for (int yh = 0; yh < img2->height; yh++)
   {
-    for (int j = 0; j < img2->width; j++)
-      img1->pixel[(i + y) * img1->width + (j + x)] = img1->pixel[(i + y) * img1->width + (j + x)] * (1 - alpha) + img2->pixel[i * img2->width + j] * alpha;
+    for (int xw = 0; xw < img2->width; xw++)
+    {
+      level = (int)((1 - alpha) * ImageGetPixel(img1, x + xw, y + yh) +
+                    (alpha)*ImageGetPixel(img2, xw, yh) + 0.5);
+      ImageSetPixel(img1, x + xw, y + yh, level);
+    }
   }
-
-  assert(ImageMaxval(img1) == ImageMaxval(img2));
 }
 
 /// Compare an image to a subimage of a larger image.
@@ -719,6 +707,8 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2)
       }
     }
   }
+
+  return 1;
 }
 
 /// Locate a subimage inside another image.
@@ -726,10 +716,33 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2)
 /// If a match is found, returns 1 and matching position is set in vars (*px, *py).
 /// If no match is found, returns 0 and (*px, *py) are left untouched.
 int ImageLocateSubImage(Image img1, int *px, int *py, Image img2)
-{ ///
+{
   assert(img1 != NULL);
   assert(img2 != NULL);
-  // Insert your code here!
+
+  // Check if the dimensions of img2 are smaller than img1
+  if (img2->width > img1->width || img2->height > img1->height)
+  {
+    return 0; // img2 is larger than img1, no match possible
+  }
+
+  // Iterate through img1 to find a match with img2
+  for (int i = 0; i <= img1->height - img2->height; i++)
+  {
+    for (int j = 0; j <= img1->width - img2->width; j++)
+    {
+      if (ImageMatchSubImage(img1, j, i, img2))
+      {
+        // Match found, set the coordinates and return 1
+        *px = j;
+        *py = i;
+        return 1;
+      }
+    }
+  }
+
+  // No match found
+  return 0;
 }
 
 /// Filtering
@@ -741,49 +754,45 @@ int ImageLocateSubImage(Image img1, int *px, int *py, Image img2)
 void ImageBlur(Image img, int dx, int dy)
 {
   assert(img != NULL);
-  assert(dx >= 0 && dy >= 0);
+  int width = img->width;
+  int height = img->height;
 
-  // Create a temporary image to store the blurred result
-  Image blurredImg = ImageCreate(img->width, img->height, img->maxval);
+  // Temporary storage for the new pixel values
+  uint8_t newPixels[width * height];
 
-  for (int y = 0; y < img->height; ++y)
+  for (int y = 0; y < height; y++)
   {
-    for (int x = 0; x < img->width; ++x)
+    for (int x = 0; x < width; x++)
     {
-      // Calculate the mean of the surrounding pixels
       int sum = 0;
       int count = 0;
 
-      for (int j = -dy; j <= dy; ++j)
+      // Iterate over the surrounding rectangle
+      for (int cy = y - dy; cy <= y + dy; cy++)
       {
-        for (int i = -dx; i <= dx; ++i)
+        for (int cx = x - dx; cx <= x + dx; cx++)
         {
-          int nx = x + i;
-          int ny = y + j;
-
-          // Check if the pixel is within the image boundaries
-          if (ImageValidPos(img, nx, ny))
+          // Check if the position is within image bounds
+          if (cx >= 0 && cx < width && cy >= 0 && cy < height)
           {
-            sum += ImageGetPixel(img, nx, ny);
+            // Access the pixel value and update the sum
+            sum += ImageGetPixel(img, cx, cy);
             count++;
           }
         }
       }
 
-      // Calculate the mean and update the blurred image
-      ImageSetPixel(blurredImg, x, y, sum / count);
+      // Calculate the mean value
+      double meanValue = (double)sum / count;
+      newPixels[y * width + x] = (uint8_t)(meanValue + 0.5); // Add 0.5 for rounding
     }
   }
 
-  // Copy the blurred image back to the original image
-  for (int y = 0; y < img->height; ++y)
+  // Update the image with the new pixel values
+  for (int i = 0; i < width * height; i++)
   {
-    for (int x = 0; x < img->width; ++x)
-    {
-      ImageSetPixel(img, x, y, ImageGetPixel(blurredImg, x, y));
-    }
+    int x = i % width;
+    int y = i / width;
+    ImageSetPixel(img, x, y, newPixels[i]);
   }
-
-  // Destroy the temporary image
-  ImageDestroy(&blurredImg);
 }
