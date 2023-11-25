@@ -760,54 +760,96 @@ void ImageBlur(Image img, int dx, int dy)
   // Temporary storage for the intermediate pixel values
   double intermediatePixels[width * height];
 
-  // Step 1: Blur in the x-direction
+  // Blur in the x-direction
   for (int y = 0; y < height; y++)
   {
-    for (int x = 0; x < width; x++)
-    {
-      int sum = 0;
-      int count = 0;
+    double total = 0.0;
+    int count = 0;
 
-      // Iterate over the neighboring pixels in the x-direction
-      for (int cx = x - dx; cx <= x + dx; cx++)
+    // Initialize the window for the first pixel
+    for (int cx = 0; cx <= dx; cx++)
+    {
+      if (cx < width)
       {
-        // Check if the position is within image bounds
-        if (cx >= 0 && cx < width)
-        {
-          // Access the pixel value and update the sum
-          sum += ImageGetPixel(img, cx, y);
-          count++;
-        }
+        total += ImageGetPixel(img, cx, y);
+        count++;
+      }
+    }
+
+    // Process the first pixel in the row
+    intermediatePixels[y * width] = total / count;
+
+    // Update the window for subsequent pixels in the row
+    for (int x = 1; x < width; x++)
+    {
+      // Remove the leftmost pixel from the previous window
+      if (x - dx - 1 >= 0)
+      {
+        total -= ImageGetPixel(img, x - dx - 1, y);
+        count--;
+      }
+
+      // Add the rightmost pixel to the window
+      if (x + dx < width)
+      {
+        total += ImageGetPixel(img, x + dx, y);
+        count++;
       }
 
       // Calculate the mean value
-      intermediatePixels[y * width + x] = (double)sum / count;
+      intermediatePixels[y * width + x] = total / count;
     }
   }
 
-  // Step 2: Blur in the y-direction and update the image with the final pixel values
-  for (int y = 0; y < height; y++)
+  // Blur in the y-direction and update the image with the final pixel values
+  for (int x = 0; x < width; x++)
   {
-    for (int x = 0; x < width; x++)
-    {
-      double sum = 0;
-      int count = 0;
+    double total = 0.0;
+    int count = 0;
 
-      // Iterate over the neighboring pixels in the y-direction
-      for (int cy = y - dy; cy <= y + dy; cy++)
+    // Initialize the window for the first pixel
+    for (int cy = 0; cy <= dy; cy++)
+    {
+      total += intermediatePixels[cy * width + x];
+      count++;
+    }
+
+    // Process the first pixel in the column
+    int meanValue = (int)(total / count + 0.5);
+
+    // Clamp the result to the valid range for uint8_t
+    meanValue = (meanValue < 0) ? 0 : (meanValue > 255) ? 255
+                                                        : meanValue;
+
+    // Update the pixel value
+    ImageSetPixel(img, x, 0, (uint8_t)meanValue);
+
+    // Update the window for subsequent pixels in the column
+    for (int y = 1; y < height; y++)
+    {
+      // Remove the topmost pixel from the previous window
+      if (y - dy - 1 >= 0)
       {
-        // Check if the position is within image bounds
-        if (cy >= 0 && cy < height)
-        {
-          // Access the pixel value from the intermediate pixels and update the sum
-          sum += intermediatePixels[cy * width + x];
-          count++;
-        }
+        total -= intermediatePixels[(y - dy - 1) * width + x];
+        count--;
+      }
+
+      // Add the bottommost pixel to the window
+      if (y + dy < height)
+      {
+        total += intermediatePixels[(y + dy) * width + x];
+        count++;
       }
 
       // Calculate the mean value
-      double meanValue = (double)sum / count;
-      ImageSetPixel(img, x, y, (uint8_t)(meanValue + 0.5)); // Add 0.5 for rounding
+      meanValue = (int)(total / count + 0.5);
+
+      // Clamp the result to the valid range for uint8_t
+      meanValue = (meanValue < 0) ? 0 : (meanValue > 255) ? 255
+                                                          : meanValue;
+
+      // Update the pixel value
+      ImageSetPixel(img, x, y, (uint8_t)meanValue);
     }
   }
 }
