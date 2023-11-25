@@ -758,7 +758,7 @@ void ImageBlur(Image img, int dx, int dy)
   int height = img->height;
 
   // Temporary storage for the intermediate pixel values
-  uint8_t intermediatePixels[width * height];
+  double intermediatePixels[width * height];
 
   // Step 1: Blur in the x-direction
   for (int y = 0; y < height; y++)
@@ -781,17 +781,16 @@ void ImageBlur(Image img, int dx, int dy)
       }
 
       // Calculate the mean value
-      double meanValue = (double)sum / count;
-      intermediatePixels[y * width + x] = (uint8_t)(meanValue + 0.5); // Add 0.5 for rounding
+      intermediatePixels[y * width + x] = (double)sum / count;
     }
   }
 
   // Step 2: Blur in the y-direction and update the image with the final pixel values
-  for (int x = 0; x < width; x++)
+  for (int y = 0; y < height; y++)
   {
-    for (int y = 0; y < height; y++)
+    for (int x = 0; x < width; x++)
     {
-      int sum = 0;
+      double sum = 0;
       int count = 0;
 
       // Iterate over the neighboring pixels in the y-direction
