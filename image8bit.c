@@ -757,9 +757,10 @@ void ImageBlur(Image img, int dx, int dy)
   int width = img->width;
   int height = img->height;
 
-  // Temporary storage for the new pixel values
-  uint8_t newPixels[width * height];
+  // Temporary storage for the intermediate pixel values
+  uint8_t intermediatePixels[width * height];
 
+  // Step 1: Blur in the x-direction
   for (int y = 0; y < height; y++)
   {
     for (int x = 0; x < width; x++)
@@ -767,32 +768,47 @@ void ImageBlur(Image img, int dx, int dy)
       int sum = 0;
       int count = 0;
 
-      // Iterate over the surrounding rectangle
-      for (int cy = y - dy; cy <= y + dy; cy++)
+      // Iterate over the neighboring pixels in the x-direction
+      for (int cx = x - dx; cx <= x + dx; cx++)
       {
-        for (int cx = x - dx; cx <= x + dx; cx++)
+        // Check if the position is within image bounds
+        if (cx >= 0 && cx < width)
         {
-          // Check if the position is within image bounds
-          if (cx >= 0 && cx < width && cy >= 0 && cy < height)
-          {
-            // Access the pixel value and update the sum
-            sum += ImageGetPixel(img, cx, cy);
-            count++;
-          }
+          // Access the pixel value and update the sum
+          sum += ImageGetPixel(img, cx, y);
+          count++;
         }
       }
 
       // Calculate the mean value
       double meanValue = (double)sum / count;
-      newPixels[y * width + x] = (uint8_t)(meanValue + 0.5); // Add 0.5 for rounding
+      intermediatePixels[y * width + x] = (uint8_t)(meanValue + 0.5); // Add 0.5 for rounding
     }
   }
 
-  // Update the image with the new pixel values
-  for (int i = 0; i < width * height; i++)
+  // Step 2: Blur in the y-direction and update the image with the final pixel values
+  for (int x = 0; x < width; x++)
   {
-    int x = i % width;
-    int y = i / width;
-    ImageSetPixel(img, x, y, newPixels[i]);
+    for (int y = 0; y < height; y++)
+    {
+      int sum = 0;
+      int count = 0;
+
+      // Iterate over the neighboring pixels in the y-direction
+      for (int cy = y - dy; cy <= y + dy; cy++)
+      {
+        // Check if the position is within image bounds
+        if (cy >= 0 && cy < height)
+        {
+          // Access the pixel value from the intermediate pixels and update the sum
+          sum += intermediatePixels[cy * width + x];
+          count++;
+        }
+      }
+
+      // Calculate the mean value
+      double meanValue = (double)sum / count;
+      ImageSetPixel(img, x, y, (uint8_t)(meanValue + 0.5)); // Add 0.5 for rounding
+    }
   }
 }
