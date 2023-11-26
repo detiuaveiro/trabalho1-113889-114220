@@ -47,19 +47,19 @@ int main(int argc, char *argv[])
   // worst case
   // Image img3 = ImageLoad(argv[2]);
   // copiar com crop uma foto exatamente igual à img 1 so que sera img3
-  Image img3 = ImageCrop(img1, 0, 0, ImageWidth(img1), ImageHeight(img1));
+  Image img3 = ImageCrop(img1, 30, 89, ImageWidth(img1), ImageHeight(img1));
   // mudar o ultimo pixel para preto
   ImageSetPixel(img3, ImageWidth(img3) - 1, ImageHeight(img3) - 1, 0);
 
   // test ImageLocateSubImage(Image img1, int *px, int *py, Image img2) para best e worst case
-  // best case
-  int px, py;
-  InstrReset();
-  ImageLocateSubImage(img1, &px, &py, img2);
-  InstrPrint();
-  printf("px = %d, py = %d\n", px, py);
+  // // best case
+  // int px, py;
+  // InstrReset();
+  // ImageLocateSubImage(img1, &px, &py, img2);
+  // InstrPrint();
+  // printf("px = %d, py = %d\n", px, py);
 
-  // worst case
+  // // worst case
   int px2, py2;
   InstrReset();
   ImageLocateSubImage(img1, &px2, &py2, img3);
