@@ -148,30 +148,30 @@ void ImageInit(void)
   InstrCalibrate();
   InstrName[0] = "pixmem"; // InstrCount[0] will count pixel array acesses
   // Name other counters here....
-  InstrName[1] = "negative";  // Name for negative transformation
-  InstrName[2] = "threshold"; // Name for threshold transformation
-  InstrName[3] = "rotate";    // Name for rotate transformation
-  InstrName[4] = "mirror";    // Name for mirror transformation
-  InstrName[5] = "crop";      // Name for crop transformation
-  InstrName[6] = "paste";     // Name for paste operation
-  InstrName[7] = "blend";     // Name for blend operation
-  InstrName[8] = "matchsub";  // Name for match subimage operation
+  // InstrName[1] = "negative";  // Name for negative transformation
+  // InstrName[2] = "threshold"; // Name for threshold transformation
+  // InstrName[3] = "rotate";    // Name for rotate transformation
+  // InstrName[4] = "mirror";    // Name for mirror transformation
+  // InstrName[5] = "crop";      // Name for crop transformation
+  // InstrName[6] = "paste";     // Name for paste operation
+  // InstrName[7] = "blend";     // Name for blend operation
+  // InstrName[8] = "matchsub";  // Name for match subimage operation
   // InstrName[10] = "locatesub"; // Name for locate subimage operation
-  InstrName[9] = "blur"; // Name for blur operation
+  // InstrName[9] = "blur"; // Name for blur operation
 }
 
 // Macros to simplify accessing instrumentation counters:
 #define PIXMEM InstrCount[0]
-#define NEGATIVE InstrCount[1]
-#define THRESHOLD InstrCount[2]
-#define ROTATE InstrCount[3]
-#define MIRROR InstrCount[4]
-#define CROP InstrCount[5]
-#define PASTE InstrCount[6]
-#define BLEND InstrCount[7]
-#define MATCHSUB InstrCount[8]
+// #define NEGATIVE InstrCount[1]
+// #define THRESHOLD InstrCount[2]
+// #define ROTATE InstrCount[3]
+// #define MIRROR InstrCount[4]
+// #define CROP InstrCount[5]
+// #define PASTE InstrCount[6]
+// #define BLEND InstrCount[7]
+// #define MATCHSUB InstrCount[8]
 // #define LOCATESUB InstrCount[10]
-#define BLUR InstrCount[9]
+// #define BLUR InstrCount[9]
 // Add more macros here if needed...
 
 // TIP: Search for PIXMEM or InstrCount to see where it is incremented!
@@ -621,6 +621,14 @@ Image ImageCrop(Image img, int x, int y, int w, int h)
   // 2. copy the pixels from the original image to the new image
   // 3. return the new image
 
+  // Verificar se as coordenadas e dimensões do recorte são válidas
+  if (!ImageValidRect(img, x, y, w, h))
+  {
+    fprintf(stderr, "Error: Invalid crop region.\n");
+    // Pode retornar NULL ou outro valor de erro
+    return NULL;
+  }
+
   // 1. create a new image
   Image img2 = ImageCreate(w, h, img->maxval);
 
@@ -693,14 +701,21 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2)
   assert(img2 != NULL);
   assert(ImageValidPos(img1, x, y));
   // Insert your code here!
-  for (int yh = 0; yh < img2->height; yh++)
+  // code:
+  // 1. compare the pixels from img2 to img1
+
+  // 1. compare the pixels from img2 to img1
+  for (int i = 0; i < img2->height; i++)
   {
-    for (int xw = 0; xw < img2->width; xw++)
+    for (int j = 0; j < img2->width; j++)
     {
-      if (!(ImageGetPixel(img1, x + xw, y + yh) == ImageGetPixel(img2, xw, yh)))
+      if (img1->pixel[(i + y) * img1->width + (j + x)] != img2->pixel[i * img2->width + j])
+      {
         return 0;
+      }
     }
   }
+
   return 1;
 }
 
@@ -737,7 +752,6 @@ int ImageLocateSubImage(Image img1, int *px, int *py, Image img2)
   // No match found
   return 0;
 }
-
 /// Filtering
 
 /// Blur an image by a applying a (2dx+1)x(2dy+1) mean filter.

@@ -42,7 +42,36 @@ int main(int argc, char *argv[])
   // img2 = ImageCrop(img1, ImageWidth(img1)/4, ImageHeight(img1)/4, ImageWidth(img1)/2, ImageHeight(img1)/2);
   // Image img2 = ImageCrop(img1, 5, 78, ImageWidth(img1) / 2, ImageHeight(img1) / 3);
 
-  // // test ImageLocateSubImage(Image img1, int *px, int *py, Image img2)
+  // best case
+  Image img2 = ImageCrop(img1, 0, 0, ImageWidth(img1), ImageHeight(img1));
+  // worst case
+  // Image img3 = ImageLoad(argv[2]);
+  // copiar com crop uma foto exatamente igual à img 1 so que sera img3
+  Image img3 = ImageCrop(img1, 0, 0, ImageWidth(img1), ImageHeight(img1));
+  // mudar o ultimo pixel para preto
+  ImageSetPixel(img3, ImageWidth(img3) - 1, ImageHeight(img3) - 1, 0);
+
+  // test ImageLocateSubImage(Image img1, int *px, int *py, Image img2) para best e worst case
+  // best case
+  int px, py;
+  InstrReset();
+  ImageLocateSubImage(img1, &px, &py, img2);
+  InstrPrint();
+  printf("px = %d, py = %d\n", px, py);
+
+  // worst case
+  int px2, py2;
+  InstrReset();
+  ImageLocateSubImage(img1, &px2, &py2, img3);
+  InstrPrint();
+  printf("px = %d, py = %d\n", px2, py2);
+
+  // InstrReset();
+  // ImageLocateSubImage(img1, &px, &py, img3);
+  // InstrPrint();
+  // printf("px = %d, py = %d\n", px, py);
+
+  // test ImageLocateSubImage(Image img1, int *px, int *py, Image img2)
   // int px, py;
   // InstrReset();
   // ImageLocateSubImage(img1, &px, &py, img2);
@@ -54,7 +83,7 @@ int main(int argc, char *argv[])
   //   error(2, errno, "Rotating img2: %s", ImageErrMsg());
   // }
 
-  // // testar a função ImageLocateSubImage
+  // testar a função ImageLocateSubImage
   // printf("# Teste da função ImageLocateSubImage\n");
 
   // // criar uma imagem branca com o pixel ultimo pixel preto
@@ -85,7 +114,7 @@ int main(int argc, char *argv[])
   //   printf("\n");
   // }
 
-  Image img2 = ImageLoad(argv[1]);
+  // Image img2 = ImageLoad(argv[1]);
 
   // Test ImageBlur(Image img, int dx, int dy)
   // ImageBlur(img2, 3, 3);
@@ -94,9 +123,9 @@ int main(int argc, char *argv[])
   // ImageBlur(img2, 5, 5);
   // InstrPrint();
   // ainda mais blured
-  InstrReset();
-  ImageBlur(img2, 7, 7);
-  InstrPrint();
+  // InstrReset();
+  // ImageBlur(img2, 7, 7);
+  // InstrPrint();
   // InstrReset();
   // ImageBlur(img2, 15, 15);
   // InstrPrint();
