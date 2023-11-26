@@ -711,6 +711,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2)
       uint8 pixelImg2 = ImageGetPixel(img2, j, i);
 
       PIXCMP += 1;
+      printf("pixelSubImage: %d\n", pixelSubImage);
 
       if (pixelSubImage != pixelImg2)
       {
