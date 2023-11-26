@@ -147,6 +147,7 @@ void ImageInit(void)
 { ///
   InstrCalibrate();
   InstrName[0] = "pixmem"; // InstrCount[0] will count pixel array acesses
+  InstrName[1] = "pixcmp"; // InstrCount[1] will count pixel comparisons
   // Name other counters here....
   // InstrName[1] = "negative";  // Name for negative transformation
   // InstrName[2] = "threshold"; // Name for threshold transformation
@@ -162,6 +163,7 @@ void ImageInit(void)
 
 // Macros to simplify accessing instrumentation counters:
 #define PIXMEM InstrCount[0]
+#define PIXCMP InstrCount[1]
 // #define NEGATIVE InstrCount[1]
 // #define THRESHOLD InstrCount[2]
 // #define ROTATE InstrCount[3]
@@ -695,29 +697,6 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha)
 /// Compare an image to a subimage of a larger image.
 /// Returns 1 (true) if img2 matches subimage of img1 at pos (x, y).
 /// Returns 0, otherwise.
-// int ImageMatchSubImage(Image img1, int x, int y, Image img2)
-// { ///
-//   assert(img1 != NULL);
-//   assert(img2 != NULL);
-//   assert(ImageValidPos(img1, x, y));
-//   // Insert your code here!
-//   // code:
-//   // 1. compare the pixels from img2 to img1
-
-//   // 1. compare the pixels from img2 to img1
-//   for (int i = 0; i < img2->height; i++)
-//   {
-//     for (int j = 0; j < img2->width; j++)
-//     {
-//       if (img1->pixel[(i + y) * img1->width + (j + x)] != img2->pixel[i * img2->width + j])
-//       {
-//         return 0;
-//       }
-//     }
-//   }
-
-//   return 1;
-// }
 int ImageMatchSubImage(Image img1, int x, int y, Image img2)
 {
   assert(img1 != NULL);
@@ -730,6 +709,8 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2)
     {
       uint8 pixelSubImage = ImageGetPixel(img1, x + j, y + i);
       uint8 pixelImg2 = ImageGetPixel(img2, j, i);
+
+      PIXCMP += 1;
 
       if (pixelSubImage != pixelImg2)
       {
