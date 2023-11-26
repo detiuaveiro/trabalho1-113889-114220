@@ -13,7 +13,6 @@
 // NMec: 113889 Name: Hugo Castro
 // NMec: 114220 Name: Rita Silva
 //
-// teste
 //
 // Date: 2023-11-14
 //
@@ -194,11 +193,6 @@ Image ImageCreate(int width, int height, uint8 maxval)
   assert(height >= 0);
   assert(0 < maxval && maxval <= PixMax);
   // Insert your code here!
-  // code:
-  // 1. allocate memory for the image structure
-  // 2. allocate memory for the pixel array
-  // 3. initialize the image structure fields
-  // 4. return the new image
 
   // 1. allocate memory for the image structure
   Image img = (Image)malloc(sizeof(struct image));
@@ -235,10 +229,6 @@ void ImageDestroy(Image *imgp)
 { ///
   assert(imgp != NULL);
   // Insert your code here!
-  // code:
-  // 1. free the pixel array
-  // 2. free the image structure
-  // 3. set the image pointer to NULL
 
   // 1. free the pixel array
   free((*imgp)->pixel);
@@ -369,9 +359,6 @@ void ImageStats(Image img, uint8 *min, uint8 *max)
 { ///
   assert(img != NULL);
   // Insert your code here!
-  // code:
-  // 1. initialize min and max
-  // 2. find min and max
 
   // 1. initialize min and max
   *min = PixMax;
@@ -405,10 +392,8 @@ int ImageValidRect(Image img, int x, int y, int w, int h)
 { ///
   assert(img != NULL);
   // Insert your code here!
-  // code:
-  // 1. check if the rectangle is inside the image
 
-  // 1. check if the rectangle is inside the image
+  // 1. check if the rectangle is inside the image, by checking if the coordinates are valid and if the dimensions are valid
   if (x < 0 || y < 0 || x + w > img->width || y + h > img->height)
   {
     return 0;
@@ -430,9 +415,6 @@ static inline int G(Image img, int x, int y)
 {
   int index;
   // Insert your code here!
-  // code:
-  // 1. compute the index
-  // 2. return the index
 
   // 1. compute the index
   index = y * img->width + x;
@@ -447,7 +429,7 @@ uint8 ImageGetPixel(Image img, int x, int y)
 { ///
   assert(img != NULL);
   assert(ImageValidPos(img, x, y));
-  PIXMEM += 1; // count one pixel access (read)
+  PIXMEM += 1;
   return img->pixel[G(img, x, y)];
 }
 
@@ -456,7 +438,7 @@ void ImageSetPixel(Image img, int x, int y, uint8 level)
 { ///
   assert(img != NULL);
   assert(ImageValidPos(img, x, y));
-  PIXMEM += 1; // count one pixel access (store)
+  PIXMEM += 1;
   img->pixel[G(img, x, y)] = level;
 }
 
@@ -474,8 +456,6 @@ void ImageNegative(Image img)
 { ///
   assert(img != NULL);
   // Insert your code here!
-  // code:
-  // 1. transform each pixel
 
   // 1. transform each pixel
   for (int i = 0; i < img->width * img->height; i++)
@@ -493,8 +473,6 @@ void ImageThreshold(Image img, uint8 thr)
 { ///
   assert(img != NULL);
   // Insert your code here!
-  // code:
-  // 1. transform each pixel
 
   // 1. transform each pixel
   for (int i = 0; i < img->width * img->height; i++)
@@ -582,10 +560,6 @@ Image ImageMirror(Image img)
 { ///
   assert(img != NULL);
   // Insert your code here!
-  // code:
-  // 1. create a new image
-  // 2. mirror the pixels from the original image to the new image, from right to left
-  // 3. return the new image
 
   // 1. create a new image
   Image img2 = ImageCreate(img->width, img->height, img->maxval);
@@ -618,10 +592,6 @@ Image ImageCrop(Image img, int x, int y, int w, int h)
   assert(img != NULL);
   assert(ImageValidRect(img, x, y, w, h));
   // Insert your code here!
-  // code:
-  // 1. create a new image
-  // 2. copy the pixels from the original image to the new image
-  // 3. return the new image
 
   // Verificar se as coordenadas e dimensões do recorte são válidas
   if (!ImageValidRect(img, x, y, w, h))
@@ -657,8 +627,6 @@ void ImagePaste(Image img1, int x, int y, Image img2)
   assert(img2 != NULL);
   assert(ImageValidRect(img1, x, y, img2->width, img2->height));
   // Insert your code here!
-  // code:
-  // 1. copy the pixels from img2 to img1
 
   // 1. copy the pixels from img2 to img1
   for (int i = 0; i < img2->height; i++)
@@ -683,12 +651,14 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha)
   assert(ImageValidRect(img1, x, y, img2->width, img2->height));
   // Insert your code here!
   uint8 level = 0;
-  for (int yh = 0; yh < img2->height; yh++)
+  for (int yh = 0; yh < img2->height; yh++) // yh = y height
   {
-    for (int xw = 0; xw < img2->width; xw++)
+    for (int xw = 0; xw < img2->width; xw++) // xw = x width
     {
+      // level is the new pixel value after the blend. level = (1 - alpha) * img1 + alpha * img2
       level = (int)((1 - alpha) * ImageGetPixel(img1, x + xw, y + yh) +
                     (alpha)*ImageGetPixel(img2, xw, yh) + 0.5);
+      //
       ImageSetPixel(img1, x + xw, y + yh, level);
     }
   }
@@ -703,6 +673,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2)
   assert(img2 != NULL);
   assert(ImageValidPos(img1, x, y));
 
+  //
   for (int i = 0; i < img2->height; i++)
   {
     for (int j = 0; j < img2->width; j++)
@@ -714,11 +685,11 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2)
 
       if (pixelSubImage != pixelImg2)
       {
-        return 0; // As imagens não coincidem
+        return 0; // the images don't match
       }
     }
   }
-  return 1; // As imagens coincidem
+  return 1; // the images match
 }
 
 /// Locate a subimage inside another image.
@@ -769,11 +740,11 @@ void ImageBlur(Image img, int dx, int dy)
   // Temporary storage for the intermediate pixel values
   // double intermediatePixels[width * height];
 
-  // Alocar memória dinamicamente para intermediatePixels
+  // Allocate memory for the intermediate pixel values
   double *intermediatePixels = (double *)malloc(width * height * sizeof(double));
   if (intermediatePixels == NULL)
   {
-    // Tratar falha na alocação de memória
+    // ERROR
     fprintf(stderr, "Falha na alocação de memória para intermediatePixels\n");
     return;
   }

@@ -11,20 +11,15 @@ int main(int argc, char *argv[])
 {
   ImageInit();
 
-  // criar pgm 1 pixel:
-  Image img2 = ImageCreate(1, 1, 255);
-  // defini-lo todo preto:
-  ImageSetPixel(img2, 0, 0, 0);
+  Image img1 = ImageLoad(argv[1]);
+  // img2 é uma imagem cropped da img1
+  Image img2 = ImageCrop(img1, 320, 0, 320, 480); // Correção aqui
 
-  Image img3 = ImageCreate(640, 480, 255);
-  // definir tudo branco
-  for (int i = 0; i < 640; i++)
-    for (int j = 0; j < 480; j++)
-      ImageSetPixel(img3, i, j, 255);
-
-  // testar a ImageLocateSubImage com img1 e img2 (worst case)
+  ImageSave(img2, "img2.pgm");
+  // testar a ImageLocateSubImage com img1 e img2
   int px, py;
   InstrReset();
-  ImageLocateSubImage(img3, &px, &py, img2);
+  ImageLocateSubImage(img1, &px, &py, img2);
   InstrPrint();
+  printf("px = %d, py = %d\n", px, py);
 }
