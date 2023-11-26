@@ -758,7 +758,16 @@ void ImageBlur(Image img, int dx, int dy)
   int height = img->height;
 
   // Temporary storage for the intermediate pixel values
-  double intermediatePixels[width * height];
+  // double intermediatePixels[width * height];
+
+  // Alocar memória dinamicamente para intermediatePixels
+  double *intermediatePixels = (double *)malloc(width * height * sizeof(double));
+  if (intermediatePixels == NULL)
+  {
+    // Tratar falha na alocação de memória
+    fprintf(stderr, "Falha na alocação de memória para intermediatePixels\n");
+    return;
+  }
 
   // Blur in the x-direction
   for (int y = 0; y < height; y++)
@@ -852,4 +861,7 @@ void ImageBlur(Image img, int dx, int dy)
       ImageSetPixel(img, x, y, (uint8_t)meanValue);
     }
   }
+
+  // Liberar a memória alocada dinamicamente quando não for mais necessária
+  free(intermediatePixels);
 }

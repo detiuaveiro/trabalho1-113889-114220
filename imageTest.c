@@ -57,9 +57,16 @@ int main(int argc, char *argv[])
   // Test ImageBlur(Image img, int dx, int dy)
   // ImageBlur(img2, 3, 3);
   // mais blur
+  // InstrReset();
   // ImageBlur(img2, 5, 5);
+  // InstrPrint();
   // ainda mais blured
-  ImageBlur(img2, 7, 7);
+  // InstrReset();
+  // ImageBlur(img2, 7, 7);
+  // InstrPrint();
+  InstrReset();
+  ImageBlur(img2, 15, 15);
+  InstrPrint();
 
   // ImageNegative(img2);
   // ImageThreshold(img2, 100);
@@ -75,42 +82,3 @@ int main(int argc, char *argv[])
   ImageDestroy(&img2);
   return 0;
 }
-
-// #include <assert.h>
-// #include <errno.h>
-// #include <error.h>
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <string.h>
-// #include "image8bit.h"
-// #include "instrumentation.h"
-
-// int main(int argc, char *argv[])
-// {
-//   if (argc != 3)
-//   {
-//     error(1, 0, "Usage: imageTest inputl.pgm outputl.pgm");
-//   }
-
-//   ImageInit();
-
-//   printf("# LOAD image");
-//   InstrReset(); // to reset instrumentation
-//   Image img1 = ImageLoad(argv[1]);
-//   if (img1 == NULL)
-//   {
-//     error(2, errno, "Loading %s: %s", argv[1], ImageErrMsg());
-//   }
-//   InstrPrint(); // to print instrumentation
-
-//   Image img2 = ImageLoad(argv[1]);
-
-//   if (ImageSave(img2, argv[2]) == 0)
-//   {
-//     error(2, errno, "%s: %s", argv[2], ImageErrMsg());
-//   }
-
-//   ImageDestroy(&img1);
-//   ImageDestroy(&img2);
-//   return 0;
-// }
