@@ -9,10 +9,10 @@
 
 int main(int argc, char *argv[])
 {
-    if (argc != 3)
-    {
-        error(1, 0, "Usage: imageTest input.pgm output.pgm");
-    }
+    // if (argc != 2)
+    // {
+    //     error(1, 0, "Usage: imageTest input.pgm output.pgm");
+    // }
 
     ImageInit();
 
@@ -25,17 +25,27 @@ int main(int argc, char *argv[])
     }
     InstrPrint(); // to print instrumentation
 
-    // croppar a img1 para ser uma imagem com o tamanho de um pixel e esse pixel ser igual ao primeiro da img1
-    Image img2 = ImageCrop(img1, 0, 0, 1, 1);
+    // criar pgm 1 pixel:
+    Image img2 = ImageCreate(1, 1, 255);
+    // defini-lo todo preto:
+    ImageSetPixel(img2, 0, 0, 0);
 
-    if (ImageSave(img2, argv[2]) == 0)
-    {
-        error(2, errno, "%s: %s", argv[2], ImageErrMsg());
-    }
+    Image img3 = ImageCreate(640, 480, 255);
+    // definir tudo branco
+    ImageSetPixel(img3, 0, 0, 255);
 
-    // testar a ImageLocateSubImage com img1 e img2
+    // if (ImageSave(img2, argv[2]) == 0)
+    // {
+    //     error(2, errno, "%s: %s", argv[2], ImageErrMsg());
+    // }
+    // if (ImageSave(img3, argv[2]) == 0)
+    // {
+    //     error(2, errno, "%s: %s", argv[2], ImageErrMsg());
+    // }
+
+    // testar a ImageLocateSubImage com img1 e img2 (worst case)
     int px, py;
     InstrReset();
-    ImageLocateSubImage(img1, &px, &py, img2);
+    ImageLocateSubImage(img2, &px, &py, img3);
     InstrPrint();
 }
