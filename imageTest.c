@@ -12,10 +12,8 @@ int main(int argc, char *argv[])
   ImageInit();
 
   Image img1 = ImageLoad(argv[1]);
-  // img2 é uma imagem cropped da img1
-  Image img2 = ImageCrop(img1, 320, 0, 320, 480); // Correção aqui
+  Image img2 = ImageCrop(img1, 230, 40, 100, 150);
 
-  ImageSave(img2, "img2.pgm");
   // testar a ImageLocateSubImage com img1 e img2
   int px, py;
   InstrReset();
